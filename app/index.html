@@ -1,14 +1,14 @@
 <!DOCTYPE html>
 <html lang="en" >
   <head>
-    <title>Angular Material - Starter App</title>
+    <title>agap - material</title>
 
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="description" content="">
     <meta name="viewport" content="initial-scale=1, maximum-scale=1, user-scalable=no" />
 
-    <link rel='stylesheet' href='http://fonts.googleapis.com/css?family=Roboto:400,500,700,400italic'>
+    <link href='http://fonts.googleapis.com/css?family=Noto+Sans' rel='stylesheet' type='text/css'>
     <link rel="stylesheet" href="./bower_components/angular-material/angular-material.css"/>
     <link rel="stylesheet" href="assets/app.css"/>
   </head>
@@ -20,7 +20,7 @@
                 md-is-locked-open="$mdMedia('gt-sm')">
 
     <md-toolbar class="md-whiteframe-z1">
-      <h1>Users</h1>
+      <h1>Menu</h1>
     </md-toolbar>
 
     <md-list>
@@ -41,7 +41,7 @@
       <md-button class="menu" hide-gt-sm ng-click="ul.toggleList()" aria-label="Show User List">
         <md-icon md-svg-icon="menu" ></md-icon>
       </md-button>
-      <h1>Angular Material - Starter App</h1>
+      <h1>agap - material</h1>
     </md-toolbar>
 
     <md-content flex id="content">
@@ -82,7 +82,8 @@
                       .icon("phone"      , "./assets/svg/phone.svg"       , 512);
 
                       $mdThemingProvider.theme('default')
-                          .primaryPalette('brown')
+                          //vedi /bower_components/angular-material/angular-material.js
+                          .primaryPalette('lime')
                           .accentPalette('red');
 
               });
