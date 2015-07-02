@@ -1,6 +1,19 @@
-<section>
-    <md-subheader class="md-primary">Contact list</md-subheader>
-    <md-button class="md-fab md-mini md-accent" aria-label="Use Android">
-        <md-icon md-svg-icon="contacts-add"></md-icon>
-    </md-button>
-</section>
+<div ng-controller="ContactsController as cctrl" layout="column" flex layout-fill>
+    <md-content layout-padding>
+        <section>
+            <md-input-container>
+                <label>Search</label>
+                <input type="text" ng-model="search" agap-search-rx="cctrl.searchFunc" agap-search-rx-callback="cctrl.searchCallback" agap-search-rx-min-length="5">
+            </md-input-container>
+            <md-list>
+                <md-list-item ng-repeat="contact in cctrl.contacts">
+                    {{contact.name}}
+                </md-list-item>
+            </md-list>
+            <span ng-show="cctrl.contacts.length == 0">Contacts not found</span>
+        </section>
+        <md-button class="md-fab md-mini md-accent" aria-label="Add contacts">
+            <md-icon md-svg-icon="contacts-add"></md-icon>
+        </md-button>
+    </md-content>
+</div>

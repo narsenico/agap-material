@@ -34,39 +34,83 @@
 
             }
         ])
-        .controller('MainController', ['$scope', '$mdSidenav', '$route', function($scope, $mdSidenav, $route) {
-            var self = this;
 
-            //menu list
-            self.menus = [{
-                id: "home",
-                caption: "Home",
-                icon: "home",
-                href: "#"
-            }, {
-                id: "contacts",
-                caption: "Contacts",
-                icon: "contacts",
-                href: "#/contacts"
-            }, {
-                id: "calendar",
-                caption: "Calendar",
-                icon: "calendar",
-                href: "#/calendar"
-            }];
+    //attributes:
+    //  - agap-search-rx: search func
+    //  - agap-search-rx-callback: callback func
+    //  - agap-search-rx-min-length: num
+    .directive('agapSearchRx', [function() {
 
-            //selected menu
-            self.selected = self.menus[0];
+        function link(scope, element, attrs) {
 
-            //
-            self.selectMenu = function(menu) {
-                self.selected = menu;
-                self.toggleMenu();
-            };
+            //retrieve params
+            var minLength = parseInt(attrs.agapSearchRxMinLength) || 3;
+            //retrieve functions
+            var fnSearch = (scope.$eval(attrs.agapSearchRx) || angular.noop);
+            var callback = (scope.$eval(attrs.agapSearchRxCallback) || angular.noop);
 
-            //
-            self.toggleMenu = function() {
-                $mdSidenav('left').toggle();
-            };
-        }]);
+            //stream
+            var keyups = Rx.Observable.fromEvent(element, 'keyup')
+                .map(function(e) {
+                    return e.target.value;
+                })
+                .filter(function(text) {
+                    return text.length >= minLength;
+                });
+
+            var debounced = keyups
+                .debounce(500 /* ms */ );
+
+            var distinct = debounced
+                .distinctUntilChanged();
+
+            var suggestions = distinct
+                .flatMapLatest(fnSearch);
+
+            suggestions.forEach(function(data) {
+                callback(data);
+            });
+        }
+
+        return {
+            restrict: 'A',
+            link: link
+        };
+    }])
+
+    .controller('MainController', ['$scope', '$mdSidenav', '$route', function($scope, $mdSidenav, $route) {
+        var self = this;
+
+        //menu list
+        self.menus = [{
+            id: "home",
+            caption: "Home",
+            icon: "home",
+            href: "#"
+        }, {
+            id: "contacts",
+            caption: "Contacts",
+            icon: "contacts",
+            href: "#/contacts"
+        }, {
+            id: "calendar",
+            caption: "Calendar",
+            icon: "calendar",
+            href: "#/calendar"
+        }];
+
+        //selected menu
+        self.selected = self.menus[0];
+
+        //
+        self.selectMenu = function(menu) {
+            self.selected = menu;
+            self.toggleMenu();
+        };
+
+        //
+        self.toggleMenu = function() {
+            $mdSidenav('left').toggle();
+        };
+    }]);
 })();
