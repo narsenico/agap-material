@@ -1,12 +1,19 @@
 (function() {
     "use strict";
 
-    var DEBUG = true;
-
     angular
         .module('agapApp', ['ngRoute', 'ngMaterial'])
-        .config(['$routeProvider', '$mdThemingProvider', '$mdIconProvider',
-            function($routeProvider, $mdThemingProvider, $mdIconProvider) {
+
+        .provider('agapModules', function AgapModulesProvider() {
+            //TODO load modules
+
+            this.$get = [function() {
+                return new AgapModules();
+            }];
+        })
+
+        .config(['$routeProvider', '$mdThemingProvider', '$mdIconProvider', 'agapModulesProvider',
+            function($routeProvider, $mdThemingProvider, $mdIconProvider, agapModulesProvider) {
 
                 //icons configuration
                 $mdIconProvider
@@ -46,6 +53,10 @@
                         contoller: 'CalendarController',
                         controllerAs: 'calendarCtrls'
                     });
+
+                //TODO caricare i moduli
+                //agapModulesProvider.modules ...
+
                 $routeProvider.otherwise({
                     redirectTo: '/home'
                 });
@@ -95,56 +106,23 @@
         };
     }])
 
-    //
-    .factory('remoteLog', [function() {
-        //TODOD log remoto (asincrono, aggiungere i log ad una coda e ogni tanto fare la chiamata remota)
-        return {
-            log: function() {
-                if (DEBUG) {
-                    console.log.apply(console, Array.prototype.slice.apply(arguments));
+    .run(['$rootScope', '$location', 'agapConfig', 'remoteLog', 'agapLogin',
+        function($rootScope, $location, agapConfig, remoteLog, agapLogin) {
+            agapConfig.logLevel = agapConfig.DEBUG;
+            agapConfig.save();
+
+            //registro l'evento al cambiamento della route
+            //  se l'utente non è loggato e l'accesso alla route non è libero (isFree)
+            //  blocco la richiesta e reindirizzo a /login
+            $rootScope.$on('$routeChangeStart', function(evt, next, current) {
+                remoteLog.log('route changing', next.templateUrl, ' isfree ', next.isFree);
+                if (!next.isFree && !agapLogin().isLogged) {
+                    remoteLog.log('ERR', 'user not logged: redirect to login');
+                    $location.path('/login');
                 }
-            }
-        };
-
-    }])
-
-    //login service
-    //  - (no args): return: user info
-    //  - user, password: login, return: user info
-    .factory('login', [function($rootScope, remoteLog) {
-        var userInfo = {
-            isLogged: false,
-            name: null,
-            groups: []
-        };
-
-        var loginService = function(user, password) {
-            if (user === undefined) {
-                return userInfo;
-            } else {
-                //TODO login
-                remoteLog.log('LOGIN', user);
-                userInfo.isLogged = true;
-                userInfo.name = user;
-                userInfo.groups = ['user'];
-                return userInfo;
-            }
-        };
-        return loginService;
-    }])
-
-    .run(['$rootScope', '$location', 'remoteLog', 'login', function($rootScope, $location, remoteLog, login) {
-        //registro l'evento al cambiamento della route
-        //  se l'utente non è loggato e l'accesso alla route non è libero (isFree)
-        //  blocco la richiesta e reindirizzo a /login
-        $rootScope.$on('$routeChangeStart', function(evt, next, current) {
-            remoteLog.log('route changing', next.templateUrl, ' isfree ', next.isFree);
-            if (!next.isFree && !login().isLogged) {
-                remoteLog.log('ERR', 'user not logged: redirect to login');
-                $location.path('/login');
-            }
-        });
-    }])
+            });
+        }
+    ])
 
     ;
 

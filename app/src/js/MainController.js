@@ -1,8 +1,8 @@
 (function() {
     "use strict";
     angular.module('agapApp')
-        .controller('MainController', ['$scope', '$mdSidenav', '$route', 'login',
-         function($scope, $mdSidenav, $route, login) {
+        .controller('MainController', ['$scope', '$mdSidenav', '$route',
+         function($scope, $mdSidenav, $route) {
             var self = this;
 
             //menu list
