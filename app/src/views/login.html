@@ -1,1 +1,15 @@
-LOGIN
+<div layout="column" flex layout-fill ng-controller="LoginController as loginCtrl">
+    <md-content layout-padding>
+        <form name="frmLogin" ng-submit="loginCtrl.login()">
+            <md-input-container>
+                <label>User</label>
+                <input ng-model="loginCtrl.user" name="user">
+            </md-input-container>
+            <md-input-container>
+                <label>Password</label>
+                <input ng-model="loginCtrl.password" name="password">
+            </md-input-container>
+            <md-button class="md-raised md-primary">Login</md-button>
+        </form>
+    </md-content>
+</div>

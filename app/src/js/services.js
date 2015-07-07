@@ -40,9 +40,9 @@
     }])
 
     //login service
-    //  - (no args): return: user info
-    //  - user, password: login, return: user info
-    .factory('agapLogin', [function($rootScope, remoteLog) {
+    //  - (no args): return: promise user info
+    //  - user, password: login, return: promise user info
+    .factory('agapLogin', ['$q', 'remoteLog', function($q, remoteLog) {
         var userInfo = {
             isLogged: false,
             name: null,
@@ -50,16 +50,25 @@
         };
 
         var loginService = function(user, password) {
-            if (user === undefined) {
-                return userInfo;
+            var def = $q.defer();
+            if (user !== undefined) {
+            	console.log("fake login", user, password);
+                setTimeout(function() {
+                    if (user == password) {
+				        //TODO fake login
+	                    remoteLog.log('LOGIN', user);
+	                    userInfo.isLogged = true;
+	                    userInfo.name = user;
+	                    userInfo.groups = ['user'];
+	            		def.resolve(userInfo);
+            		} else {
+            			def.reject({ err: 401, message: "not authorized" });
+            		}
+                }, 100);
             } else {
-                //TODO login
-                remoteLog.log('LOGIN', user);
-                userInfo.isLogged = true;
-                userInfo.name = user;
-                userInfo.groups = ['user'];
-                return userInfo;
+            	def.resolve(userInfo);
             }
+            return def.promise;
         };
         return loginService;
     }])

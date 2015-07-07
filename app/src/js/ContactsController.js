@@ -3,6 +3,7 @@
     angular.module('agapApp')
         .controller('ContactsController', ['$scope', '$q', function($scope, $q) {
             var self = this;
+            console.log("ContactsController");
 
             self.contacts = [];
 

@@ -4,64 +4,59 @@
     angular
         .module('agapApp', ['ngRoute', 'ngMaterial'])
 
-        .provider('agapModules', function AgapModulesProvider() {
-            //TODO load modules
+    //provider per la gestione dei moduli
+    .provider('agapModules', function AgapModulesProvider() {
+        //TODO load modules
 
-            this.$get = [function() {
-                return new AgapModules();
-            }];
-        })
+        this.$get = [function() {
+            return new AgapModules();
+        }];
+    })
 
-        .config(['$routeProvider', '$mdThemingProvider', '$mdIconProvider', 'agapModulesProvider',
-            function($routeProvider, $mdThemingProvider, $mdIconProvider, agapModulesProvider) {
+    .config(['$routeProvider', '$mdThemingProvider', '$mdIconProvider', 'agapModulesProvider',
+        function($routeProvider, $mdThemingProvider, $mdIconProvider, agapModulesProvider) {
 
-                //icons configuration
-                $mdIconProvider
-                    .icon("home", "./assets/svg/home.svg", 24)
-                    .icon("menu", "./assets/svg/menu.svg", 24)
-                    .icon("contacts", "./assets/svg/account.svg", 24)
-                    .icon("calendar", "./assets/svg/calendar-clock.svg", 24)
-                    .icon("contacts-add", "./assets/svg/account-plus.svg", 24);
+            //icons configuration
+            $mdIconProvider
+                .icon("home", "./assets/svg/home.svg", 24)
+                .icon("menu", "./assets/svg/menu.svg", 24)
+                .icon("contacts", "./assets/svg/account.svg", 24)
+                .icon("calendar", "./assets/svg/calendar-clock.svg", 24)
+                .icon("contacts-add", "./assets/svg/account-plus.svg", 24);
 
-                //theme configuration
-                $mdThemingProvider.theme('default')
-                    //vedi http://www.google.com/design/spec/style/color.html#color-color-palette
-                    .primaryPalette('blue-grey')
-                    .accentPalette('pink')
-                    .warnPalette('red');
+            //theme configuration
+            $mdThemingProvider.theme('default')
+                //vedi http://www.google.com/design/spec/style/color.html#color-color-palette
+                .primaryPalette('blue-grey')
+                .accentPalette('pink')
+                .warnPalette('red');
+            $mdThemingProvider.theme('docs-dark', 'default')
+                .primaryPalette('yellow')
+                .dark();
 
-                //
-                $routeProvider
-                    .when('/login', {
-                        templateUrl: './src/views/login.html',
-                        contoller: 'LoginController',
-                        controllerAs: 'loginCtrl',
-                        isFree: true
-                    })
-                    .when('/home', {
-                        templateUrl: './src/views/home.html',
-                        contoller: 'HomeController',
-                        controllerAs: 'homeCtrl'
-                    })
-                    .when('/contacts', {
-                        templateUrl: './src/views/contacts.html',
-                        controller: 'ContactsController',
-                        controllerAs: 'contactsCtrl'
-                    })
-                    .when('/calendar', {
-                        templateUrl: './src/views/calendar.html',
-                        contoller: 'CalendarController',
-                        controllerAs: 'calendarCtrls'
-                    });
-
-                //TODO caricare i moduli
-                //agapModulesProvider.modules ...
-
-                $routeProvider.otherwise({
-                    redirectTo: '/home'
+            //
+            $routeProvider
+                .when('/home', {
+                    templateUrl: './src/views/home.html'
+                })
+                .when('/contacts', {
+                    templateUrl: './src/views/contacts.html'
+                })
+                .when('/calendar', {
+                    templateUrl: './src/views/calendar.html'
+                })
+                .when('/login', {
+                    templateUrl: './src/views/login.html'
                 });
-            }
-        ])
+
+            //TODO caricare i moduli
+            //agapModulesProvider.modules ...
+
+            $routeProvider.otherwise({
+                redirectTo: '/home'
+            });
+        }
+    ])
 
     //attributes:
     //  - agap-search-rx: search func
@@ -116,9 +111,15 @@
             //  blocco la richiesta e reindirizzo a /login
             $rootScope.$on('$routeChangeStart', function(evt, next, current) {
                 remoteLog.log('route changing', next.templateUrl, ' isfree ', next.isFree);
-                if (!next.isFree && !agapLogin().isLogged) {
-                    remoteLog.log('ERR', 'user not logged: redirect to login');
-                    $location.path('/login');
+                if (!next.isFree) {
+                    agapLogin().then(function(auth) {
+                        if (!auth.isLogged) {
+                            //TODO se agapConfig.rememberLogin e trovo le informazioni sull'utente
+                            //  nella localStorage provare il login con quelle
+                            remoteLog.log('ERR', 'user not logged: redirect to login');
+                            $location.path('/login');
+                        }
+                    });
                 }
             });
         }
