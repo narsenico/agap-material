@@ -13,7 +13,7 @@
 </head>
 
 <body layout="row" ng-controller="MainController as mainCtrl">
-    <md-sidenav class="site-sidenav md-sidenav-left md-whiteframe-z2" md-component-id="left" md-is-locked-open="$mdMedia('gt-sm')">
+    <md-sidenav class="site-sidenav md-sidenav-left md-whiteframe-z2" md-component-id="left" md-is-locked-open="$mdMedia('gt-sm')" ng-show="mainCtrl.menuVisible">
         <md-toolbar class="md-whiteframe-z1">
             <h1>agap</h1>
         </md-toolbar>

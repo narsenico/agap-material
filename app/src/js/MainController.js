@@ -23,6 +23,9 @@
                 href: "/calendar"
             }];
 
+            //indica se il menu deve essere visibile, per default no
+            //  diventa visibile grazie all'evento agapMenuVisible
+            self.menuVisible = false;
             //selected menu
             self.selected = self.menus[0];
 
@@ -41,5 +44,11 @@
             self.toggleMenu = function() {
                 $mdSidenav('left').toggle();
             };
+
+            //gestisco l'evento agapMenuVisible
+            $scope.$on('agapMenuVisible', function(e, showing) {
+                self.menuVisible = showing;
+            });
+
         }]);
 })();

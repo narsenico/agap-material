@@ -76,6 +76,20 @@
     //
     .factory('agapData', [function() {
 
-    }]);
+    }])
+
+    //eventi: agapMenuVisible
+    //funzioni: showMenu
+    .factory('UI', ['$rootScope', function UIProvider($rootScope) {
+
+        function showMenu(showing) {
+            $rootScope.$broadcast('agapMenuVisible', showing);
+        }
+
+        return {
+            showMenu: showMenu
+        };
+    }])
+    ;
 
 })();
