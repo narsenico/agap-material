@@ -6,7 +6,6 @@ body {
     margin: 0px;
     padding: 0px;
 }
-/* Toolbar area */
 
 .menu {
     background-color: transparent;
@@ -15,11 +14,6 @@ body {
     margin: 16px;
     width: 36px;
 }
-
-md-toolbar h1 {
-    margin: auto;
-}
-/* Sidenav area */
 
 md-list .md-button {
     color: inherit;
@@ -35,14 +29,17 @@ md-list .md-button.selected {
 md-sidenav md-list {
     padding: 0px 0px 8px 0px;
 }
-/* Utils */
 
 .content-wrapper {
     position: relative;
 }
-/* Typography support coming in 0.8.0 */
 
 md-toolbar h1 {
     font-size: 1.250em;
     font-weight: 400;
+    margin: auto 24px;
+}
+
+md-content.section-login {
+    width: 350px;
 }

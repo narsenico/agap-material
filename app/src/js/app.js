@@ -2,10 +2,10 @@
     "use strict";
 
     angular
-        .module('agapApp', ['ngRoute', 'ngMaterial'])
+        .module('agapApp', ['ngRoute', 'ngMaterial', 'ngMessages'])
 
     //provider per la gestione dei moduli
-    .provider('agapModules', function AgapModulesProvider() {
+    .provider('agapModules', function agapModulesProvider() {
         //TODO load modules
 
         this.$get = [function() {
@@ -14,12 +14,13 @@
     })
 
     .config(['$routeProvider', '$mdThemingProvider', '$mdIconProvider', 'agapModulesProvider',
-        function($routeProvider, $mdThemingProvider, $mdIconProvider, agapModulesProvider) {
+        function agapConfig($routeProvider, $mdThemingProvider, $mdIconProvider, agapModulesProvider) {
 
             //icons configuration
             $mdIconProvider
                 .icon("home", "./assets/svg/home.svg", 24)
                 .icon("menu", "./assets/svg/menu.svg", 24)
+                .icon("logout", "./assets/svg/logout.svg", 24)
                 .icon("contacts", "./assets/svg/account.svg", 24)
                 .icon("calendar", "./assets/svg/calendar-clock.svg", 24)
                 .icon("contacts-add", "./assets/svg/account-plus.svg", 24);
@@ -27,7 +28,7 @@
             //theme configuration
             $mdThemingProvider.theme('default')
                 //vedi http://www.google.com/design/spec/style/color.html#color-color-palette
-                .primaryPalette('blue-grey')
+                .primaryPalette('teal')
                 .accentPalette('pink')
                 .warnPalette('red');
             $mdThemingProvider.theme('docs-dark', 'default')
@@ -46,7 +47,11 @@
                     templateUrl: './src/views/calendar.html'
                 })
                 .when('/login', {
-                    templateUrl: './src/views/login.html'
+                    templateUrl: './src/views/login.html',
+                    isAccessFree: true
+                })
+                .when('/logout', {
+                    redirectTo: '/login'
                 });
 
             //TODO caricare i moduli
@@ -101,25 +106,46 @@
         };
     }])
 
-    .run(['$rootScope', '$location', 'agapConfig', 'remoteLog', 'agapLogin',
-        function($rootScope, $location, agapConfig, remoteLog, agapLogin) {
+    .run(['$rootScope', '$location', 'agapConfig', 'remoteLog', 'agapLogin', 'UI',
+        function agapRun($rootScope, $location, agapConfig, remoteLog, agapLogin, UI) {
             agapConfig.logLevel = agapConfig.DEBUG;
             agapConfig.save();
 
+            function checkSecurity(route, auth) {
+                //TODO controllare sicurezza: l'utente può accedere alla route?
+                //  if (not auth) { redirect }
+                //else
+                UI.showMenu(true);
+            }
+
             //registro l'evento al cambiamento della route
-            //  se l'utente non è loggato e l'accesso alla route non è libero (isFree)
+            //  se l'utente non è loggato e l'accesso alla route non è libero (isAccessFree)
             //  blocco la richiesta e reindirizzo a /login
             $rootScope.$on('$routeChangeStart', function(evt, next, current) {
-                remoteLog.log('route changing', next.templateUrl, ' isfree ', next.isFree);
-                if (!next.isFree) {
-                    agapLogin().then(function(auth) {
-                        if (!auth.isLogged) {
-                            //TODO se agapConfig.rememberLogin e trovo le informazioni sull'utente
-                            //  nella localStorage provare il login con quelle
-                            remoteLog.log('ERR', 'user not logged: redirect to login');
-                            $location.path('/login');
+                remoteLog.log('route changing', next.templateUrl, ' isAccessFree ', next.isAccessFree);
+                if (!next.isAccessFree) {
+                    agapLogin().then(
+                        function(auth) {
+                            //contorllo le autorizzazioni autorizzazioni
+                            checkSecurity(next, auth);
+                        },
+                        function(err) {
+                            //login automatico
+                            if (err.errCode == "E002" && agapConfig.rememberLogin) {
+                                remoteLog.log('user not logged, try automatic login');
+                                agapLogin(agapConfig.lastUser, agapConfig.lastPassword).then(function(auth) {
+                                    //contorllo le autorizzazioni autorizzazioni
+                                    checkSecurity(next, auth);
+                                }, function(err) {
+                                    remoteLog.log('ERR', 'user not logged: redirect to login');
+                                    $location.path('/login');
+                                });
+                            } else {
+                                remoteLog.log('ERR', 'user not logged: redirect to login');
+                                $location.path('/login');
+                            }
                         }
-                    });
+                    );
                 }
             });
         }

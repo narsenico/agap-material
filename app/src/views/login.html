@@ -1,14 +1,20 @@
 <div layout="column" flex layout-fill ng-controller="LoginController as loginCtrl">
-    <md-content layout-padding>
-        <form name="frmLogin" ng-submit="loginCtrl.login()">
+    <md-content layout-padding class="section-login">
+        <form name="loginForm" ng-submit="loginCtrl.login()">
             <md-input-container>
                 <label>User</label>
-                <input ng-model="loginCtrl.user" name="user">
+                <input ng-model="loginCtrl.user" type="text" name="user" required>
+                <div ng-messages="loginForm.user.$error" ng-show="loginForm.user.$dirty">
+                    <div ng-message="required">This is required!</div>
+                </div>
             </md-input-container>
             <md-input-container>
                 <label>Password</label>
-                <input ng-model="loginCtrl.password" name="password">
+                <input ng-model="loginCtrl.password" type="password" name="password">
             </md-input-container>
+            <md-checkbox ng-model="loginCtrl.rememberLogin" aria-label="Remember me">
+                Remember me
+            </md-checkbox>
             <md-button class="md-raised md-primary">Login</md-button>
         </form>
     </md-content>
