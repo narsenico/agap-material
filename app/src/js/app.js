@@ -4,17 +4,8 @@
     angular
         .module('agapApp', ['ngRoute', 'ngMaterial', 'ngMessages'])
 
-    //provider per la gestione dei moduli
-    .provider('agapModules', function agapModulesProvider() {
-        //TODO load modules
-
-        this.$get = [function() {
-            return new AgapModules();
-        }];
-    })
-
-    .config(['$routeProvider', '$mdThemingProvider', '$mdIconProvider', 'agapModulesProvider',
-        function agapConfig($routeProvider, $mdThemingProvider, $mdIconProvider, agapModulesProvider) {
+    .config(['$routeProvider', '$mdThemingProvider', '$mdIconProvider',
+        function agapConfig($routeProvider, $mdThemingProvider, $mdIconProvider) {
 
             //icons configuration
             $mdIconProvider
@@ -54,8 +45,15 @@
                     redirectTo: '/login'
                 });
 
-            //TODO caricare i moduli
-            //agapModulesProvider.modules ...
+            //TODO caricare i moduli AGAP_MODULES
+            for (var agapModuleName in AGAP_MODULES) {
+                var agapModule = AGAP_MODULES[agapModuleName];
+                console.log('module', agapModuleName, '->', agapModule.route, 'enabled', !!agapModule.enabled);
+                if (agapModule.enabled === false) continue;
+                $routeProvider.when(agapModule.route, {
+                    templateUrl: './src/modules/' + agapModule.mainTemplateUrl
+                });
+            }
 
             $routeProvider.otherwise({
                 redirectTo: '/home'
